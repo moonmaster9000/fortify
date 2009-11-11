@@ -35,8 +35,14 @@ Let's suppose you're going to create a form for creating Books. However, your Bo
     
 
 This, of course fails. Why? When you create a new Book object, unlike ActiveRecord (which has the luxury of querying the database to 
-determine the object's attributes), ActiveResource starts off as a blank slate. To get this to work, you need to give your new Book object
-some default attributes: 
+determine the object's attributes), ActiveResource starts off as a blank slate. In other words:
+
+  console> b = Book.new
+  console> b.attributes.inspect
+    ==> {}
+
+
+To get this to work, you would have to give your new Book object some default attributes: 
 
   # app/controllers/books_controller.rb
   class BooksController < ActiveResource::Base
