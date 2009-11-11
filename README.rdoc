@@ -1,0 +1,89 @@
+=Introduction 
+
+Know how you can't just use 'form_for' in rails with a newly initialized ActiveResource object?
+Ever get annoyed at having to add default attributes to your newly initialized ActiveResource objects?
+Fortify gives you the power to DRY'ly define default attributes for your ActiveResource derived classes.
+
+== Motivation
+
+Let's suppose you're going to create a form for creating Books. However, your Book is an ActiveResource::Base derived class:
+
+  # app/models/book.rb
+  class Book < ActiveResource::Base
+  end
+
+  # app/controllers/books_controller.rb
+  class BooksController < ActiveResource::Base
+    def new
+      @book = Book.new
+    end
+  end
+
+  # app/view/books/new.haml
+  - form_for @book do |f|
+    .field
+      = f.label :title
+      = f.text_field :title
+      
+    .field
+      = f.label :author
+      = f.text_field :author
+    
+    .field
+      = f.label :genre
+      = f.text_field :genre
+    
+
+This, of course fails. Why? When you create a new Book object, unlike ActiveRecord (which has the luxury of querying the database to 
+determine the object's attributes), ActiveResource starts off as a blank slate. To get this to work, you need to give your new Book object
+some default attributes: 
+
+  # app/controllers/books_controller.rb
+  class BooksController < ActiveResource::Base
+    def new
+      @book = Book.new :title => nil, :author => nil, :genre => nil
+    end
+  end
+
+As you can imagine, this approach might not be very DRY. This is where *fortify* steps in. 
+
+== Usage
+
+First, install fortify by adding the following line to your config/environment.rb and then running "sudo rake gems:install":
+
+  config.gem :fortify, :lib => 'fortify', :source => 'http://gemcutter.org'
+
+Next, go back to your book model and add some fortification to it:
+
+  # app/models/book.rb
+  class Book < ActiveResource::Base
+    fortify do |default_attributes|
+      default_attributes.author
+      default_attributes.title
+      default_attributes.genre
+    end
+    self.site = ''
+  end
+
+Now, your controller / views as you originally specified them will work, since now: 
+
+  console> b = Book.new
+  console> b.attributes.inspect
+    ==> {:author => nil, :title => nil, :genre => nil}
+
+You could also have provided some default values for your attributes:
+ 
+  # app/models/book.rb
+  class Book < ActiveResource::Base
+    fortify do |default_attributes|
+      default_attributes.author = 'Anonymous'
+      default_attributes.title = 'Untitled'
+      default_attributes.genre
+    end
+    self.site = ''
+  end
+
+In this case, a Book.new would give you: 
+  console> b = Book.new
+  console> b.attributes.inspect
+    ==> {:author => 'Anonymous', :title => 'Untitled', :genre => nil}
