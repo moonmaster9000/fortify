@@ -70,7 +70,7 @@ ActiveResource::Base.instance_eval do
   
   def process_symbols(args)
     raise ArgumentError.new("if you pass several parameters to fortify, they must all be symbols") unless args_are_symbols(args)
-    args.map {|attribute| @default_attributes.send attribute}
+    args.map {|attribute| default_attributes.send attribute}
   end
   
   def args_are_symbols(args)

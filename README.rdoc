@@ -59,16 +59,13 @@ First, install fortify by adding the following line to your config/environment.r
 
   config.gem :fortify, :lib => 'fortify', :source => 'http://gemcutter.org'
 
-Next, go back to your book model and add some fortification to it:
+Next, go back to your book model and add some fortification to it. You can do this in one of three ways. Let's first assume that 
+we just want to make sure the Book model has "author", "title", and "genre" attributes.
 
   # app/models/book.rb
   class Book < ActiveResource::Base
-    fortify do |default_attributes|
-      default_attributes.author
-      default_attributes.title
-      default_attributes.genre
-    end
     self.site = ''
+    fortify :author, :title, :genre
   end
 
 Now, your controller / views as you originally specified them will work, since now: 
@@ -77,19 +74,32 @@ Now, your controller / views as you originally specified them will work, since n
   console> b.attributes.inspect
     ==> {:author => nil, :title => nil, :genre => nil}
 
-You could also have provided some default values for your attributes:
+What if, however, we wanted default values for each of those attributes?
  
   # app/models/book.rb
   class Book < ActiveResource::Base
-    fortify do |default_attributes|
-      default_attributes.author = 'Anonymous'
-      default_attributes.title = 'Untitled'
-      default_attributes.genre
-    end
     self.site = ''
+    fortify :author => 'Anonymous', :genre => 'Unknown', :title => 'Untitled'
   end
 
 In this case, a Book.new would give you: 
   console> b = Book.new
   console> b.attributes.inspect
-    ==> {:author => 'Anonymous', :title => 'Untitled', :genre => nil}
+    ==> {:author => 'Anonymous', :title => 'Untitled', :genre => 'Unknown'}
+    
+Lastly, what if we only wanted a default value for the :author attribute? Try this: 
+  # app/models/book.rb
+  class Book < ActiveResource::Base
+    self.site = ''
+    fortify do |attrs|
+      attrs.author = 'Anonymous'
+      attrs.title
+      attrs.genre
+    end
+  end
+
+Console would report something like this: 
+console> b = Book.new
+console> b.attributes.inspect
+  ==> {:author => 'Anonymous', :title => nil, :genre => nil}
+
