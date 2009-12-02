@@ -26,20 +26,55 @@ ActiveResource::Base.instance_eval do
       name[-1..-1] == '=' ? name[0..-2] : name
     end
   end
-  
-  class BlockRequiredError < ArgumentError; end
-  
+    
   class BlockArgumentError < ArgumentError; end
   
   
-  def fortify(&block)
-    raise BlockRequiredError.new("you must pass a block to fortify") unless block
-    raise BlockArgumentError.new("the block you pass to fortify must accept one argument") unless block.arity == 1
-    block.call default_attributes
+  def fortify(*args, &block)
+    if block
+      process_block(block)
+    elsif passed_a_hash(args)
+      process_hash(args.first)
+    elsif passed_one_or_more_nonhash_parameters(args)
+      process_symbols(args)
+    end
   end
   
   def default_attributes
     @default_attributes ||= DefaultAttributes.new
+  end
+  
+  private
+  def process_hash(args)
+    args.each do |attr_name, attr_value|
+      default_attributes.send(
+        (attr_name.to_s + '=').to_sym, 
+        attr_value
+      )
+    end
+  end
+  
+  def process_block(block)
+    raise BlockArgumentError.new("the block you pass to fortify must accept one argument") unless block.arity == 1
+    block.call default_attributes
+  end
+  
+  def passed_a_hash(args)
+    args.length == 1 && args.first.kind_of?(Hash)
+  end
+  
+  def passed_one_or_more_nonhash_parameters(args)
+    args.respond_to?(:length) && 
+    (args.length > 1 || (args.length == 1 && args.first.kind_of?(Symbol)))
+  end
+  
+  def process_symbols(args)
+    raise ArgumentError.new("if you pass several parameters to fortify, they must all be symbols") unless args_are_symbols(args)
+    args.map {|attribute| @default_attributes.send attribute}
+  end
+  
+  def args_are_symbols(args)
+    args.inject(true) {|bool, current_arg| bool && current_arg.class == Symbol}    
   end
 end
 
