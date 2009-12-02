@@ -99,7 +99,7 @@ Lastly, what if we only wanted a default value for the :author attribute? Try th
   end
 
 Console would report something like this: 
-console> b = Book.new
-console> b.attributes.inspect
-  ==> {:author => 'Anonymous', :title => nil, :genre => nil}
+  console> b = Book.new
+  console> b.attributes.inspect
+    ==> {:author => 'Anonymous', :title => nil, :genre => nil}
 
