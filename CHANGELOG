@@ -1,0 +1,2 @@
+v 0.0.3
+  -- fixed a bug that happened when your code caused activeresource objects to explicitly initialize with "nil" 

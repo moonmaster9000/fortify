@@ -13,7 +13,7 @@ begin
     gemspec.files       = FileList['lib/**/*.rb', 'README.rdoc']
     gemspec.homepage    = "http://github.com/moonmaster9000/fortify"
     gemspec.authors     = ["Matt Parker"]
-    gemspec.add_dependency('rails', '>= 2.3.3')
+    gemspec.add_dependency('activeresource', '>= 2.3.3')
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError

@@ -1,3 +1,3 @@
-$LOAD_PATH << './lib'
-require 'activeresource'
+$LOAD_PATH.unshift './lib'
+require 'active_resource'
 require 'fortify'

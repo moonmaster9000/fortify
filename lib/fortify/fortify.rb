@@ -80,6 +80,7 @@ end
 
 ActiveResource::Base.class_eval do
   def initialize_with_default_attributes(attributes={})
+    attributes ||= {}
     initialize_without_default_attributes self.class.default_attributes.attributes.merge(attributes)
   end
     
